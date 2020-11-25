@@ -15,6 +15,7 @@ jobs:
     - id: build
       run: |
         git checkout release/next 2>/dev/null || git checkout -b release/next
+        git branch
         rm -rf build
         mkdir -p ./build && cp *.txt ./build/
         git config user.name "${{ github.actor }}-bot" && git config user.email "${{ github.actor }}@users.noreply.gihub.com"
@@ -29,7 +30,7 @@ jobs:
         fi
         
     - name: Create Pull Request
-      if: steps.build.outputs.MAKE_PR == '1'
+      if: steps.build.outputs.MAKE_PR == '0' # Temporarily disable
       id: create_pull
       uses: peter-evans/create-pull-request@v3
       with:
