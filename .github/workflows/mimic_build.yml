@@ -51,9 +51,6 @@ jobs:
         milestone: 1
         draft: false
   
-    - name: View CPR output
-      run: echo ${{ steps.create_pull.outputs }}
-  
     - name: Check outputs & Create RELEASE_LOCK
       id: release_lock
       if: steps.build.outputs.MAKE_PR == '1'
