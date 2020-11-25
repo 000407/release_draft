@@ -49,7 +49,7 @@ jobs:
         draft: false
   
     - name: View CPR output
-      run: echo ${{ steps.cpr.outputs }}
+      run: echo ${{ steps.create_pull.outputs }}
   
     - name: Check outputs & Create RELEASE_LOCK
       id: release_lock
@@ -58,14 +58,14 @@ jobs:
         echo "Pull Request Number - ${{ steps.cpr.outputs.pull-request-number }}"
         echo "Pull Request URL - ${{ steps.cpr.outputs.pull-request-url }}"
         
-        echo ${{ steps.cpr.outputs.pull-request-number }} > ./.RELEASE_LOCK
+        # echo ${{ steps.cpr.outputs.pull-request-number }} > ./.RELEASE_LOCK
         
         git checkout release/next 2>/dev/null || git checkout -b release/next
         git config user.name "${{ github.actor }}-bot" && git config user.email "${{ github.actor }}@users.noreply.gihub.com"
         if ! git diff-index --quiet HEAD --; then
-          git add .
-          git commit -m "Commit:Release Lock File"
-          git push origin release/next
+          # git add .
+          # git commit -m "Commit:Release Lock File"
+          # git push origin release/next
         fi
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
