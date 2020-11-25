@@ -14,6 +14,7 @@ jobs:
     - run: mkdir -p ./build && cp *.txt ./build/
     - run: git config user.name "${{ github.actor }}-bot" && git config user.email "${{ github.actor }}@users.noreply.gihub.com"
     - run: git commit -m "Commit:Build Output"
+    - run: echo $?
     - run: git push origin release/next
     - name: Create Pull Request
       id: cpr
