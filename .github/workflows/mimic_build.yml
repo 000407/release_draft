@@ -9,16 +9,20 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - run: |
+    - id: build
+      run: |
         git checkout release/next 2>/dev/null || git checkout -b release/next
         rm -rf build
         mkdir -p ./build && cp *.txt ./build/
         git config user.name "${{ github.actor }}-bot" && git config user.email "${{ github.actor }}@users.noreply.gihub.com"
-        git commit -m "Commit:Build Output"
-        echo $?
-        git push origin release/next
+        if ! git diff-index --quiet HEAD --; then
+            git commit -m "Commit:Build Output"
+            git push origin release/next
+            echo '::set-output name=CHANGES_PRESENT::1'
+        fi
     - name: Create Pull Request
-      id: cpr
+      if: steps.random-color-generator.outputs.CHANGES_PRESENT == '1'
+      id: create_pull
       uses: peter-evans/create-pull-request@v3
       with:
         token: ${{ secrets.REPO_ACCESS_TOKEN }}
@@ -39,8 +43,19 @@ jobs:
         draft: false
 
     - name: Check outputs
+      id: release_lock
+      if: steps.random-color-generator.outputs.CHANGES_PRESENT == '1'
       run: |
         echo "Pull Request Number - ${{ steps.cpr.outputs.pull-request-number }}"
         echo "Pull Request URL - ${{ steps.cpr.outputs.pull-request-url }}"
+        
+        echo ${{ steps.cpr.outputs.pull-request-number }} > ./.RELEASE_LOCK
+        
+        git checkout release/next 2>/dev/null || git checkout -b release/next
+        git config user.name "${{ github.actor }}-bot" && git config user.email "${{ github.actor }}@users.noreply.gihub.com"
+        if ! git diff-index --quiet HEAD --; then
+            git commit -m "Commit:Release Lock File"
+            git push origin release/next
+        fi
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
