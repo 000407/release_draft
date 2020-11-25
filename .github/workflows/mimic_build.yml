@@ -16,12 +16,13 @@ jobs:
         mkdir -p ./build && cp *.txt ./build/
         git config user.name "${{ github.actor }}-bot" && git config user.email "${{ github.actor }}@users.noreply.gihub.com"
         if ! git diff-index --quiet HEAD --; then
-          if [ ! -f ./RELEASE_LOCK ]; then
-            echo '::set-output name=MAKE_PR::1'
-          fi
           git add .
           git commit -m "Commit:Build Output"
           git push origin release/next
+        fi
+        
+        if [ ! -f ./RELEASE_LOCK ]; then
+          echo '::set-output name=MAKE_PR::1'
         fi
         
     - name: Create Pull Request
@@ -34,6 +35,7 @@ jobs:
         committer: GitHub <noreply@github.com>
         author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
         signoff: false
+        base: master
         branch: release/next
         delete-branch: true
         title: 'Next Release'
