@@ -12,7 +12,7 @@ jobs:
     - run: git checkout release/next 2>/dev/null || git checkout -b release/next
     - run: rm -rf build
     - run: mkdir -p ./build && cp *.txt ./build/
-    - run: git config user.name ${{ github.actor }}-bot && ${{ github.actor }}@users.noreply.gihub.com
+    - run: git config user.name "${{ github.actor }}-bot" && git config user.email "${{ github.actor }}@users.noreply.gihub.com"
     - run: git commit -m "Commit:Build Output"
     - run: git push origin release/next
     - name: Create Pull Request
