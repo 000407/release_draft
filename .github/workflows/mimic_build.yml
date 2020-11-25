@@ -16,12 +16,16 @@ jobs:
         mkdir -p ./build && cp *.txt ./build/
         git config user.name "${{ github.actor }}-bot" && git config user.email "${{ github.actor }}@users.noreply.gihub.com"
         if ! git diff-index --quiet HEAD --; then
-            git commit -m "Commit:Build Output"
-            git push origin release/next
-            echo '::set-output name=CHANGES_PRESENT::1'
+          if [ ! -f ./RELEASE_LOCK ]; then
+            echo '::set-output name=MAKE_PR::1'
+          fi
+          git add .
+          git commit -m "Commit:Build Output"
+          git push origin release/next
         fi
+        
     - name: Create Pull Request
-      if: steps.random-color-generator.outputs.CHANGES_PRESENT == '1'
+      if: steps.build.outputs.MAKE_PR == '1'
       id: create_pull
       uses: peter-evans/create-pull-request@v3
       with:
@@ -41,10 +45,13 @@ jobs:
           [1]: https://github.com/peter-evans/create-pull-request
         milestone: 1
         draft: false
-
-    - name: Check outputs
+  
+    - name: View CPR output
+      run: echo ${{ steps.cpr.outputs }}
+  
+    - name: Check outputs & Create RELEASE_LOCK
       id: release_lock
-      if: steps.random-color-generator.outputs.CHANGES_PRESENT == '1'
+      if: steps.build.outputs.MAKE_PR == '1'
       run: |
         echo "Pull Request Number - ${{ steps.cpr.outputs.pull-request-number }}"
         echo "Pull Request URL - ${{ steps.cpr.outputs.pull-request-url }}"
@@ -54,8 +61,9 @@ jobs:
         git checkout release/next 2>/dev/null || git checkout -b release/next
         git config user.name "${{ github.actor }}-bot" && git config user.email "${{ github.actor }}@users.noreply.gihub.com"
         if ! git diff-index --quiet HEAD --; then
-            git commit -m "Commit:Release Lock File"
-            git push origin release/next
+          git add .
+          git commit -m "Commit:Release Lock File"
+          git push origin release/next
         fi
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
