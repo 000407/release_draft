@@ -22,6 +22,5 @@ jobs:
         author_name: 000407-actions-bot
         author_email: kanchana@senadheera.net
         message: "Commit: Build Output"
-        branch: "release/next"
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
