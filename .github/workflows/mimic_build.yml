@@ -1,6 +1,9 @@
 name: Mimic Build Process Init
 
-on: [push]
+on:
+  push:
+    branches:
+      - master
 
 jobs:
   build:
