@@ -16,11 +16,6 @@ jobs:
     - run: git checkout release/next 2>/dev/null || git checkout -b release/next
     - run: rm -rf build
     - run: mkdir -p ./build && cp *.txt ./build/
-    - name: Commit build output
-      uses: EndBug/add-and-commit@v5
-      with:
-        author_name: 000407-actions-bot
-        author_email: kanchana@senadheera.net
-        message: "Commit: Build Output"
+    - run: echo ${{ github.actor }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
