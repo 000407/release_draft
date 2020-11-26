@@ -36,12 +36,13 @@ jobs:
       id: create_pull
       if: steps.build.outputs.MAKE_PR == '1'
       run: |
-        GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
         gh pr create \
           -B "master" \
           -H "release/next" \
           -b "PR Body" \
           -t "Next Release"
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   
     - name: Check outputs & Create RELEASE_LOCK
       id: release_lock
