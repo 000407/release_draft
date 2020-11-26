@@ -16,7 +16,7 @@ jobs:
       run: |
         git fetch origin
         if branchrev=$(git rev-parse -q --verify origin/release/next); then
-          git pull origin release/next
+          git pull origin release/next --allow-unrelated-histories
         fi
         git checkout release/next 2>/dev/null || git checkout -b release/next
         rm -rf build
