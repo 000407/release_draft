@@ -14,8 +14,11 @@ jobs:
     - uses: actions/checkout@v2
     - id: build
       run: |
+        git fetch origin
+        if branchrev=$(git rev-parse -q --verify origin/release/next); then
+          git pull origin release/next
+        fi
         git checkout release/next 2>/dev/null || git checkout -b release/next
-        git branch
         rm -rf build
         mkdir -p ./build && cp *.txt ./build/
         git config user.name "${{ github.actor }}-bot" && git config user.email "${{ github.actor }}@users.noreply.gihub.com"
@@ -34,12 +37,11 @@ jobs:
       if: steps.build.outputs.MAKE_PR == '1'
       run: |
         GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
-        url=$(gh pr create \
+        gh pr create \
           -B "master" \
           -H "release/next" \
           -b "PR Body" \
-          -t "Next Release")
-        echo '::set-output name=pr_url::$url'
+          -t "Next Release"
   
     - name: Check outputs & Create RELEASE_LOCK
       id: release_lock
