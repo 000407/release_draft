@@ -20,6 +20,7 @@ jobs:
           git pull origin release/next --allow-unrelated-histories
         fi
         git checkout release/next 2>/dev/null || git checkout -b release/next
+        git merge master
         rm -rf build
         mkdir -p ./build && cp *.txt ./build/
         if ! git diff-index --quiet HEAD --; then
