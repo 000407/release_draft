@@ -37,11 +37,12 @@ jobs:
       id: create_pull
       if: steps.build.outputs.MAKE_PR == '1'
       run: |
-        gh pr create \
+        url=$(gh pr create \
           -B "master" \
           -H "release/next" \
           -b "PR Body" \
-          -t "Next Release"
+          -t "Next Release")
+        echo '::set-output name=pr_url::$url'
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   
