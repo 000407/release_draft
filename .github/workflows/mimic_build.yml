@@ -30,7 +30,7 @@ jobs:
         fi
         
     - name: Create Pull Request
-      if: steps.build.outputs.MAKE_PR == '0' # Temporarily disable
+      if: steps.build.outputs.MAKE_PR == '1'
       id: create_pull
       uses: peter-evans/create-pull-request@v3
       with:
