@@ -29,7 +29,7 @@ jobs:
           git push origin release/next
         fi
         
-        if [ ! -f ./RELEASE_LOCK ]; then
+        if [ ! -f ./.RELEASE_LOCK ]; then
           echo '::set-output name=MAKE_PR::1'
         fi
         
@@ -42,7 +42,7 @@ jobs:
           -H "release/next" \
           -b "PR Body" \
           -t "Next Release")
-        echo '::set-output name=pr_url::$url'
+        echo "::set-output name=pr_url::$url"
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   
@@ -50,13 +50,18 @@ jobs:
       id: release_lock
       if: steps.build.outputs.MAKE_PR == '1'
       run: |
-        # echo "Pull Request Number - ${{ steps.create_pull.outputs.pull-request-number }}"
-        echo "Pull Request URL - ${{ steps.create_pull.outputs.pr_url }}"
-        
-        echo ${{ steps.create_pull.outputs.pr_url }} > ./.RELEASE_LOCK
-        
-        git checkout release/next 2>/dev/null || git checkout -b release/next
         git config user.name "${{ github.actor }}-bot" && git config user.email "${{ github.actor }}@users.noreply.gihub.com"
+        git fetch origin
+        if branchrev=$(git rev-parse -q --verify origin/release/next); then
+          git pull origin release/next --allow-unrelated-histories
+        fi
+        git checkout release/next 2>/dev/null || git checkout -b release/next
+        git merge master
+        
+        echo "${{ steps.create_pull.outputs.pr_url }}" > ./.RELEASE_LOCK
+        
+        ls -al | grep RELEASE_LOCK
+        
         if ! git diff-index --quiet HEAD --; then
           git add .
           git commit -m "Commit:Release Lock File"
